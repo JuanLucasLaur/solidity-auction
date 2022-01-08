@@ -27,7 +27,6 @@ contract Auction {
         endTime = startTime + 604800;
         bidIncrement = 100;
     }
-}
 
     /**
      * @notice Place a bid for the auction.
@@ -67,3 +66,4 @@ contract Auction {
         }
         return y;
     }
+}
