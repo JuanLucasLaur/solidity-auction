@@ -2,13 +2,16 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
+/**
+ * @title Auction contract.
+ */
 contract Auction {
     address payable public owner;
     address payable public highestBidder;
-    uint256 public startBlock;
-    uint256 public endBlock;
+    uint256 public startTime;
+    uint256 public endTime;
     uint256 public highestBindingBid;
-    uint256 bidIncrement;
+    uint256 private bidIncrement;
     string public ipfsHash;
 
     enum State {Started, Running, Ended, Cancelled}
@@ -19,9 +22,9 @@ contract Auction {
     constructor(){
         owner = payable(msg.sender);
         auctionState = State.Running;
-        startBlock = block.number;
-        /// @dev The endBlock is approximated by getting the amount of seconds in a week and then dividing it by the blocktime (15 seconds)
-        endBlock = startBlock + ((60 * 60 * 24 * 7) / 15);
+        startTime = block.timestamp;
+        // @dev The Auctions' end time is 1 week (604800 seconds) after it started.
+        endTime = startTime + 604800;
         bidIncrement = 100;
     }
 }
