@@ -28,3 +28,42 @@ contract Auction {
         bidIncrement = 100;
     }
 }
+
+    /**
+     * @notice Place a bid for the auction.
+     */
+    function placeBid() public payable {
+        /// @dev Don't let owner bid so that it can't artificially increase the price.
+        require(msg.sender != owner);
+        /// @dev Check that the auction is active.
+        require(block.number >= startTime);
+        require(block.number <= endTime);
+        require(auctionState == State.Running);
+
+        require(msg.value >= bidIncrement);
+
+        uint256 currentBid = bids[msg.sender] + msg.value;
+        require(currentBid > highestBindingBid);
+
+        bids[msg.sender] = currentBid;
+
+        if (currentBid <= bids[highestBidder]) {
+            highestBindingBid = min(currentBid + bidIncrement, bids[highestBidder]);
+        } else {
+            highestBindingBid = min(currentBid, bids[highestBidder] + bidIncrement);
+            highestBidder = payable(msg.sender);
+        }
+    }
+
+    /**
+     * @dev Returns the minimum of two values.
+     * @param x First value
+     * @param y Second value
+     * @return The minimum of the two values.
+     */
+    function min(uint256 x, uint256 y) private pure returns (uint256) {
+        if (x <= y) {
+            return x;
+        }
+        return y;
+    }
