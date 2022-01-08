@@ -19,7 +19,7 @@ contract Auction {
 
     mapping(address => uint256) public bids;
 
-    constructor(){
+    constructor() {
         owner = payable(msg.sender);
         auctionState = State.Running;
         startTime = block.timestamp;
@@ -35,14 +35,14 @@ contract Auction {
         /// @dev Don't let owner bid so that it can't artificially increase the price.
         require(msg.sender != owner);
         /// @dev Check that the auction is active.
-        require(block.number >= startTime);
-        require(block.number <= endTime);
-        require(auctionState == State.Running);
+        require(block.number >= startTime, "Auction isn't active");
+        require(block.number <= endTime, "Auction isn't active");
+        require(auctionState == State.Running, "Auction isn't active");
 
-        require(msg.value >= bidIncrement);
+        require(msg.value >= bidIncrement, "Bid too small");
 
         uint256 currentBid = bids[msg.sender] + msg.value;
-        require(currentBid > highestBindingBid);
+        require(currentBid > highestBindingBid, "Bid too small");
 
         bids[msg.sender] = currentBid;
 
@@ -52,6 +52,14 @@ contract Auction {
             highestBindingBid = min(currentBid, bids[highestBidder] + bidIncrement);
             highestBidder = payable(msg.sender);
         }
+    }
+
+    /**
+     * @notice Cancels the auction. Only the owner can do this.
+     */
+    function cancelAuction() public {
+        require(msg.sender == owner);
+        auctionState = State.Cancelled;
     }
 
     /**
