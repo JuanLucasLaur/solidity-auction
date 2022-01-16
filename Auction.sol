@@ -20,8 +20,8 @@ contract Auction {
     mapping(address => uint256) public bids;
     mapping(address => bool) public payedBidders;
 
-    constructor() {
-        owner = payable(msg.sender);
+    constructor(address creator) {
+        owner = payable(creator);
         auctionState = State.Running;
         startTime = block.timestamp;
         // @dev The Auctions' end time is 1 week (604800 seconds) after it started.
